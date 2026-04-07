@@ -523,7 +523,7 @@ class _EventCardState extends State<EventCard> {
       cueVersion--;
     }
     MyLogger.entry(
-        "Invalid Start Code $offeredCode; Valid code is '$validCode'; ",
+        "Invalid Start Code $offeredCode; Valid code is '$validCode'; RUSA member number is '${AppSettings.rusaID.value}'",
         severity: Severity.hidden);
     return "INVALID Start Code: $offeredCode";
   }

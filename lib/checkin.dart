@@ -132,6 +132,7 @@ class RiderResults {
       String checkinStatusUrl) async {
     final url = "$checkinStatusUrl/json";
     final responseBody = await Report.fetchResponseFromServer(url);
+    // MyLogger.entry("DEBUG: Raw Server Response: $responseBody");
 
     final decodedResponse = jsonDecode(responseBody) as List<dynamic>;
     if (decodedResponse.isEmpty) {

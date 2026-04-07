@@ -24,6 +24,8 @@ import 'event.dart';
 import 'activated_event.dart';
 import 'control.dart';
 
+import 'mylogger.dart';
+
 class Signature {
   Signature(
       {required this.event,
@@ -113,6 +115,11 @@ class Signature {
       riderID,
       event.region.secret,
     ].join('-');
+    /*
+    MyLogger.entry(
+        "Creating code. Plaintext: '$plainString'; Code length: $codeLength",
+        severity: Severity.hidden);
+     */
     var plaintext = utf8.encode(plainString);
     return sha256.convert(plaintext);
   }

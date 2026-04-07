@@ -28,6 +28,7 @@ import 'app_settings.dart';
 import 'mylogger.dart';
 import 'region.dart';
 import 'report.dart';
+import 'region_data.dart';
 // import 'permanent.dart';
 
 // import 'current.dart';
@@ -253,8 +254,18 @@ class ScheduledEvents {
 
       String rxSignature = eventMapFromServer['signature'] ?? '';
       String rxNonce = eventMapFromServer['nonce'] ?? '';
-      var rgn = Region.fromSettings();
-      var regionSecret = rgn.secret;
+
+      // Determine which secret to use for verification
+      String regionSecret;
+      if (scheduleEventsSource.id == ScheduleEventsSourceID.fromURL) {
+        // Use default secret for custom URLs
+        regionSecret = RegionData.defaultSecret;
+        MyLogger.entry("Custom URL source: Using defaultSecret for verification");
+      } else {
+        // Use the secret of the currently selected region
+        var rgn = Region.fromSettings();
+        regionSecret = rgn.secret;
+      }
 
       if (authenticating && (rxNonce != txNonce)) {
         throw ServerException('Nonce mismatch: TX: "$txNonce"; RX: "$rxNonce"');

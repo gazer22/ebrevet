@@ -25,6 +25,7 @@ import 'time_till.dart';
 import 'region.dart';
 import 'app_settings.dart';
 import 'utility.dart';
+import 'mylogger.dart';
 
 // MassStart -- Everyone gets the same start time. Automatic check in
 // at the first control within the early/closing window. Distance
@@ -427,7 +428,15 @@ class Event {
     var late = startTimeWindow.late;
     var answer = true;
 
+    // MyLogger.entry("DEBUG: Checking isStartable for ${name}");
+    // MyLogger.entry("DEBUG: now: ${now.toLocal()}");
+    // MyLogger.entry("DEBUG: onTime: ${onTime?.toLocal()}");
+    // MyLogger.entry("DEBUG: early: $early");
+    // MyLogger.entry("DEBUG: late: $late");
+    // MyLogger.entry("DEBUG: cueVersion: $cueVersion");
+
     if (cueVersion <= 0) {
+      // MyLogger.entry("DEBUG: isStartable failed because cueVersion <= 0");
       answer = false; // Can't start without a published cuesheet
     } else {
       switch (startTimeWindow.startStyle) {
@@ -435,10 +444,16 @@ class Event {
           if (onTime != null) {
             if (early != null) {
               var earlyTime = onTime.subtract(early);
-              if (now.isBefore(earlyTime)) answer = false;
+              if (now.isBefore(earlyTime)) {
+                // MyLogger.entry("DEBUG: isStartable failed because now is before earlyTime: ${earlyTime.toLocal()}");
+                answer = false;
+              }
             } else if (late != null) {
               var lateTime = onTime.add(late);
-              if (now.isAfter(lateTime)) answer = false;
+              if (now.isAfter(lateTime)) {
+                // MyLogger.entry("DEBUG: isStartable failed because now is after lateTime: ${lateTime.toLocal()}");
+                answer = false;
+              }
             }
           }
           break;
@@ -451,8 +466,13 @@ class Event {
           var graceDuration =
               const Duration(minutes: AppSettings.advanceStartTimeGraceMinutes);
           var graceOpenTime = onTime.subtract(graceDuration);
-          answer =
-              graceOpenTime.isBefore(now) && startControlCloseTime.isAfter(now);
+          if (graceOpenTime.isAfter(now)) {
+            // MyLogger.entry("DEBUG: isStartable failed because graceOpenTime ${graceOpenTime.toLocal()} is after now");
+            answer = false;
+          } else if (startControlCloseTime.isBefore(now)) {
+            // MyLogger.entry("DEBUG: isStartable failed because startControlCloseTime ${startControlCloseTime.toLocal()} is before now");
+            answer = false;
+          }
           break;
 
         case StartStyle.preRide:
